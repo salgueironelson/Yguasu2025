@@ -1,0 +1,84 @@
+<h2 mat-dialog-title>
+  <mat-icon>power_off</mat-icon>
+  Cortar Servicio
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="corteForm" class="corte-form">
+    <!-- Código de Instalación (readonly) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Código de Instalación</mat-label>
+      <input matInput formControlName="codigoInstalacion" readonly>
+      <mat-icon matPrefix>confirmation_number</mat-icon>
+    </mat-form-field>
+
+    <!-- Nombre del Cliente (readonly) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cliente</mat-label>
+      <input matInput formControlName="nombreCliente" readonly>
+      <mat-icon matPrefix>person</mat-icon>
+    </mat-form-field>
+
+    <!-- Motivo -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Motivo del Corte</mat-label>
+      <mat-select formControlName="motivo" required>
+        <mat-option *ngFor="let motivo of motivos" [value]="motivo">
+          {{ motivo }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matPrefix>help_outline</mat-icon>
+      <mat-error *ngIf="hasError('motivo', 'required')">
+        El motivo es requerido
+      </mat-error>
+      <mat-error *ngIf="hasError('motivo', 'minlength')">
+        El motivo debe tener al menos 3 caracteres
+      </mat-error>
+      <mat-error *ngIf="hasError('motivo', 'maxlength')">
+        El motivo no puede exceder 100 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Observaciones -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Observaciones</mat-label>
+      <textarea
+        matInput
+        formControlName="observaciones"
+        rows="4"
+        placeholder="Ingrese observaciones adicionales (opcional)">
+      </textarea>
+      <mat-icon matPrefix>notes</mat-icon>
+      <mat-error *ngIf="hasError('observaciones', 'maxlength')">
+        Las observaciones no pueden exceder 500 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Mensaje de Error -->
+    @if (errorMessage()) {
+      <div class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancelar()" [disabled]="loading()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="warn"
+    (click)="onCortar()"
+    [disabled]="loading() || corteForm.invalid">
+    @if (loading()) {
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Cortando...</span>
+    } @else {
+      <mat-icon>power_off</mat-icon>
+      <span>Cortar Servicio</span>
+    }
+  </button>
+</mat-dialog-actions>

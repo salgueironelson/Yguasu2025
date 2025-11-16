@@ -1,0 +1,140 @@
+<h2 mat-dialog-title>
+  <mat-icon>history</mat-icon>
+  Historial de Cortes y Reconexiones
+</h2>
+
+<mat-dialog-content>
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando historial...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-container">
+      <mat-icon>error</mat-icon>
+      <p>{{ errorMessage() }}</p>
+    </div>
+  } @else if (historial()) {
+    <div class="historial-container">
+      <!-- Información de la instalación -->
+      <mat-card class="info-card">
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Código de Instalación:</span>
+            <span class="info-value">{{ historial()!.codigoInstalacion }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Cliente:</span>
+            <span class="info-value">{{ historial()!.nombreCliente }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Estado Actual:</span>
+            <mat-chip-set>
+              <mat-chip [ngClass]="getEstadoBadge().clase">
+                {{ getEstadoBadge().texto }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Estadísticas -->
+      <div class="estadisticas">
+        <mat-card class="stat-card cortes-stat">
+          <mat-card-content>
+            <div class="stat-icon">
+              <mat-icon>power_off</mat-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ totalCortes() }}</div>
+              <div class="stat-label">Cortes</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card reconexiones-stat">
+          <mat-card-content>
+            <div class="stat-icon">
+              <mat-icon>power</mat-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ totalReconexiones() }}</div>
+              <div class="stat-label">Reconexiones</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="stat-card total-stat">
+          <mat-card-content>
+            <div class="stat-icon">
+              <mat-icon>timeline</mat-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ totalMovimientos() }}</div>
+              <div class="stat-label">Total Movimientos</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Línea de tiempo -->
+      @if (eventosCombinados().length > 0) {
+        <div class="timeline">
+          <h3>Línea de Tiempo</h3>
+          @for (evento of eventosCombinados(); track evento.id) {
+            <div class="timeline-item" [ngClass]="getClaseEvento(evento.tipo)">
+              <div class="timeline-marker">
+                <mat-icon>{{ getIcono(evento.tipo) }}</mat-icon>
+              </div>
+              <div class="timeline-content">
+                <mat-card>
+                  <mat-card-header>
+                    <mat-card-title>
+                      <span class="evento-tipo">{{ evento.tipo === 'corte' ? 'Corte de Servicio' : 'Reconexión de Servicio' }}</span>
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                      {{ evento.fecha | date:'dd/MM/yyyy HH:mm' }}
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="evento-detalle">
+                      <div class="detalle-row">
+                        <mat-icon>help_outline</mat-icon>
+                        <span class="detalle-label">Motivo:</span>
+                        <span class="detalle-valor">{{ evento.motivo }}</span>
+                      </div>
+                      @if (evento.observaciones) {
+                        <div class="detalle-row">
+                          <mat-icon>notes</mat-icon>
+                          <span class="detalle-label">Observaciones:</span>
+                          <span class="detalle-valor">{{ evento.observaciones }}</span>
+                        </div>
+                      }
+                      <div class="detalle-row">
+                        <mat-icon>person</mat-icon>
+                        <span class="detalle-label">Usuario:</span>
+                        <span class="detalle-valor">{{ evento.usuarioRegistro }}</span>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="no-historial">
+          <mat-icon>info</mat-icon>
+          <p>No hay historial de cortes y reconexiones para esta instalación</p>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" (click)="onCerrar()">
+    <mat-icon>close</mat-icon>
+    Cerrar
+  </button>
+</mat-dialog-actions>
