@@ -1,0 +1,84 @@
+<div class="clientes-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Gestión de Clientes</h2>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="toolbar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar cliente</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="search()"
+            placeholder="CI, NIT o nombre">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="search()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+
+        <button mat-raised-button color="accent">
+          <mat-icon>add</mat-icon>
+          Nuevo Cliente
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table mat-table [dataSource]="clientes()" class="full-width">
+            <ng-container matColumnDef="nombreCompleto">
+              <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+              <td mat-cell *matCellDef="let cliente">{{ cliente.nombreCompleto }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="ci">
+              <th mat-header-cell *matHeaderCellDef>CI</th>
+              <td mat-cell *matCellDef="let cliente">{{ cliente.ci }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="nit">
+              <th mat-header-cell *matHeaderCellDef>NIT</th>
+              <td mat-cell *matCellDef="let cliente">{{ cliente.nit }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="celular">
+              <th mat-header-cell *matHeaderCellDef>Celular</th>
+              <td mat-cell *matCellDef="let cliente">{{ cliente.celular }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let cliente">
+                <button mat-icon-button color="primary" (click)="edit(cliente)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="delete(cliente)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          @if (clientes().length === 0) {
+            <div class="no-data">
+              <p>No se encontraron clientes</p>
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

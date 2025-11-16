@@ -1,0 +1,62 @@
+.clientes-container {
+  padding: 20px;
+}
+
+mat-card {
+  mat-card-header {
+    mat-card-title {
+      h2 {
+        margin: 0;
+        color: #333;
+      }
+    }
+  }
+
+  mat-card-content {
+    .toolbar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      align-items: center;
+
+      .search-field {
+        flex: 1;
+        max-width: 400px;
+      }
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      table {
+        width: 100%;
+
+        th {
+          font-weight: 600;
+          color: #333;
+        }
+
+        td, th {
+          padding: 12px;
+        }
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+
+        p {
+          margin: 0;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
