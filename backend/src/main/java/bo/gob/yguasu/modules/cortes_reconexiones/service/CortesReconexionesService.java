@@ -264,13 +264,16 @@ public class CortesReconexionesService {
                 i._estado
             FROM cnt_instalaciones i
             JOIN cnt_usuarios u ON i.id_usuario = u.id_usuario
-            LEFT JOIN cnt_facturas f ON i.id_instalacion = f.id_instalacion
-                AND f.estado_pago != 'PAGADO'
-                AND f._estado = 'A'
+            LEFT JOIN fac_facturas f ON i.id_instalacion = f.id_instalacion
+                AND f.estado = 'A'
+                AND f.id_plan_pago IS NULL
+                AND f.fec_pago IS NULL
+                AND f._activo = TRUE
+                AND f.im_tiposector = 13
             WHERE i._estado = 'A'
                 AND i.zona BETWEEN ? AND ?
             GROUP BY i.id_instalacion, i.codigo_instalacion, u.nombres, u.paterno, u.materno, i.direccion, i.zona, i._estado
-            HAVING COUNT(DISTINCT CASE WHEN f.estado_pago != 'PAGADO' THEN f.id_factura END) >= ?
+            HAVING COUNT(DISTINCT f.id_factura) >= ?
             ORDER BY i.zona, i.codigo_instalacion
             """;
 
