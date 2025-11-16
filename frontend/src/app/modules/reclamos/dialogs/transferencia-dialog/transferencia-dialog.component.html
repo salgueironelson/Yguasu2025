@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>
+  <mat-icon>send</mat-icon>
+  Transferir Reclamo
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Reclamo #{{ data.reclamoNumero }}
+  </p>
+
+  <form [formGroup]="transferenciaForm" class="transferencia-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Usuario Destino</mat-label>
+      <mat-select formControlName="usuarioDestino" [disabled]="loadingUsuarios()">
+        @if (loadingUsuarios()) {
+          <mat-option disabled>
+            <mat-spinner diameter="20"></mat-spinner>
+            Cargando usuarios...
+          </mat-option>
+        } @else {
+          @for (usuario of usuarios(); track usuario.id) {
+            <mat-option [value]="usuario.id">
+              {{ usuario.nombre }}
+              @if (usuario.departamento) {
+                <span class="departamento-badge">{{ usuario.departamento }}</span>
+              }
+            </mat-option>
+          }
+        }
+      </mat-select>
+      <mat-hint>Selecciona el usuario que se hará cargo del reclamo</mat-hint>
+      <mat-error>Debes seleccionar un usuario destino</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Comentario de transferencia (opcional)</mat-label>
+      <textarea
+        matInput
+        formControlName="comentario"
+        rows="4"
+        placeholder="Describe el motivo de la transferencia o información relevante..."
+        [maxLength]="500"></textarea>
+      <mat-hint align="start">{{ getComentarioError() }}</mat-hint>
+      <mat-hint align="end">{{ getCharacterCount() }}</mat-hint>
+      <mat-error>{{ getComentarioError() }}</mat-error>
+    </mat-form-field>
+
+    <div class="warning-message">
+      <mat-icon>warning</mat-icon>
+      <span>El reclamo será asignado al usuario seleccionado y quedará registrado en el historial.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="submitting()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="accent"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="!transferenciaForm.valid || submitting()">
+    <mat-icon>send</mat-icon>
+    {{ submitting() ? 'Transfiriendo...' : 'Transferir' }}
+  </button>
+</mat-dialog-actions>

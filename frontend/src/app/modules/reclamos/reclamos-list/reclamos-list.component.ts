@@ -16,9 +16,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { ReclamoService } from '@core/services/reclamo.service';
 import { Reclamo, TIPOS_RECLAMO, ESTADOS_RECLAMO } from '@shared/models/reclamo.model';
+import { ComentarioDialogComponent } from '../dialogs/comentario-dialog/comentario-dialog.component';
+import { TransferenciaDialogComponent } from '../dialogs/transferencia-dialog/transferencia-dialog.component';
+import { ConclusionDialogComponent } from '../dialogs/conclusion-dialog/conclusion-dialog.component';
 
 @Component({
   selector: 'app-reclamos-list',
@@ -39,7 +44,8 @@ import { Reclamo, TIPOS_RECLAMO, ESTADOS_RECLAMO } from '@shared/models/reclamo.
     MatChipsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
+    MatSnackBarModule
   ],
   templateUrl: './reclamos-list.component.html',
   styleUrls: ['./reclamos-list.component.scss']
@@ -48,6 +54,8 @@ export class ReclamosListComponent implements OnInit {
   private fb = inject(FormBuilder);
   private reclamoService = inject(ReclamoService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   // Datos
   reclamos = signal<Reclamo[]>([]);
@@ -141,18 +149,105 @@ export class ReclamosListComponent implements OnInit {
   }
 
   agregarComentario(reclamo: Reclamo): void {
-    // TODO: Abrir diálogo de comentario
-    console.log('Agregar comentario a:', reclamo);
+    const dialogRef = this.dialog.open(ComentarioDialogComponent, {
+      width: '600px',
+      data: {
+        reclamoId: reclamo.id,
+        reclamoNumero: reclamo.numero
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && reclamo.id) {
+        this.reclamoService.agregarComentario(reclamo.id, result).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.snackBar.open('Comentario agregado exitosamente', 'Cerrar', {
+                duration: 3000,
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+              });
+              this.cargarReclamos();
+            }
+          },
+          error: () => {
+            this.snackBar.open('Error al agregar comentario', 'Cerrar', {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top'
+            });
+          }
+        });
+      }
+    });
   }
 
   transferir(reclamo: Reclamo): void {
-    // TODO: Abrir diálogo de transferencia
-    console.log('Transferir reclamo:', reclamo);
+    const dialogRef = this.dialog.open(TransferenciaDialogComponent, {
+      width: '600px',
+      data: {
+        reclamoId: reclamo.id,
+        reclamoNumero: reclamo.numero
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && reclamo.id) {
+        this.reclamoService.transferir(reclamo.id, result).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.snackBar.open('Reclamo transferido exitosamente', 'Cerrar', {
+                duration: 3000,
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+              });
+              this.cargarReclamos();
+            }
+          },
+          error: () => {
+            this.snackBar.open('Error al transferir reclamo', 'Cerrar', {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top'
+            });
+          }
+        });
+      }
+    });
   }
 
   concluir(reclamo: Reclamo): void {
-    // TODO: Abrir diálogo de conclusión
-    console.log('Concluir reclamo:', reclamo);
+    const dialogRef = this.dialog.open(ConclusionDialogComponent, {
+      width: '650px',
+      data: {
+        reclamoId: reclamo.id,
+        reclamoNumero: reclamo.numero
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && reclamo.id) {
+        this.reclamoService.concluir(reclamo.id, result).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.snackBar.open('Reclamo concluido exitosamente', 'Cerrar', {
+                duration: 3000,
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+              });
+              this.cargarReclamos();
+            }
+          },
+          error: () => {
+            this.snackBar.open('Error al concluir reclamo', 'Cerrar', {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top'
+            });
+          }
+        });
+      }
+    });
   }
 
   imprimirFicha(reclamo: Reclamo): void {

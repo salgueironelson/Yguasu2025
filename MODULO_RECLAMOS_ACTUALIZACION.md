@@ -42,6 +42,55 @@ Componente completo para visualizar y gestionar todos los reclamos del sistema.
 
 Vista completa de un reclamo individual con toda su información y trazabilidad.
 
+### 💬 **Diálogo de Comentarios** ✅
+
+Diálogo modal para agregar comentarios y avances al reclamo.
+
+#### Características:
+- Formulario reactivo con validación
+- Campo de texto con contador de caracteres (1000 máx)
+- Validación mínima de 10 caracteres
+- Mensaje informativo sobre el registro en historial
+- Feedback visual con snackbar
+- Auto-actualización del reclamo tras guardar
+
+### 📤 **Diálogo de Transferencia** ✅
+
+Diálogo modal para transferir el reclamo a otro usuario/departamento.
+
+#### Características:
+- Selector de usuario destino con búsqueda
+- Lista de usuarios con departamento visible
+- Campo opcional de comentario (500 caracteres máx)
+- Validación de usuario destino obligatorio
+- Mensaje de advertencia sobre cambio de responsable
+- Feedback visual con snackbar
+- Auto-actualización del reclamo y historial tras transferir
+
+### ✅ **Diálogo de Conclusión** ✅
+
+Diálogo modal para concluir y cerrar el reclamo.
+
+#### Características:
+- Radio buttons para marcar procedencia (Sí/No)
+- Estilos diferenciados para procedente/no procedente
+- Campo de conclusión obligatorio (min 20, máx 1000 caracteres)
+- Contador de caracteres
+- Mensaje de advertencia sobre cierre permanente
+- Validaciones completas
+- Feedback visual con snackbar
+- Auto-actualización del reclamo y historial tras concluir
+
+#### Ruta:
+```
+Desde listado: /dashboard/reclamos → botón de acciones (⋮)
+Desde detalle: /dashboard/reclamos/:id → botones de acción
+```
+
+---
+
+### 🔍 **Detalle de Reclamo** (continuación)
+
 #### Características:
 
 **Sección de Información:**
@@ -114,6 +163,25 @@ frontend/src/app/modules/reclamos/reclamo-detail/
 ```
 
 **Total Frontend:** 6 archivos nuevos, ~1,360 líneas de código
+
+### Frontend - Diálogos Modales ✅
+```
+frontend/src/app/modules/reclamos/dialogs/
+├── comentario-dialog/
+│   ├── comentario-dialog.component.ts      (110 líneas)
+│   ├── comentario-dialog.component.html    (50 líneas)
+│   └── comentario-dialog.component.scss    (80 líneas)
+├── transferencia-dialog/
+│   ├── transferencia-dialog.component.ts   (140 líneas)
+│   ├── transferencia-dialog.component.html (70 líneas)
+│   └── transferencia-dialog.component.scss (90 líneas)
+└── conclusion-dialog/
+    ├── conclusion-dialog.component.ts      (120 líneas)
+    ├── conclusion-dialog.component.html    (80 líneas)
+    └── conclusion-dialog.component.scss    (150 líneas)
+```
+
+**Total Diálogos:** 9 archivos nuevos, ~890 líneas de código
 
 ---
 
@@ -262,9 +330,9 @@ Ver resultados filtrados
 | Ver detalle | ✅ | Con historial |
 | Filtros avanzados | ✅ | 6 criterios |
 | Paginación | ✅ | Configurable |
-| Agregar comentario | 🔄 | Backend OK, falta diálogo |
-| Transferir | 🔄 | Backend OK, falta diálogo |
-| Concluir | 🔄 | Backend OK, falta diálogo |
+| Agregar comentario | ✅ | Diálogo completo + backend |
+| Transferir | ✅ | Diálogo completo + backend |
+| Concluir | ✅ | Diálogo completo + backend |
 | Imprimir fichas | ⏳ | Pendiente |
 | Notificaciones | ⏳ | Pendiente |
 
@@ -291,6 +359,6 @@ Ver resultados filtrados
 
 ---
 
-**Última actualización:** 2024
-**Versión del módulo:** 2.0 (con listado y detalle)
-**Estado:** Funcional y listo para producción (pendiente diálogos y PDFs)
+**Última actualización:** Noviembre 2024
+**Versión del módulo:** 3.0 (con diálogos modales completos)
+**Estado:** 100% Funcional - Listo para producción (pendiente solo PDFs)

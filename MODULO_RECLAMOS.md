@@ -220,10 +220,10 @@ Historial de acciones:
 ### Frontend
 - [x] ~~Componente de listado con filtros~~ (`reclamos-list.component`) ✅ **IMPLEMENTADO**
 - [x] ~~Componente de detalle con historial~~ (`reclamo-detail.component`) ✅ **IMPLEMENTADO**
-- [ ] Diálogos modales para:
-  - [ ] Agregar comentarios
-  - [ ] Transferir reclamos
-  - [ ] Concluir reclamos
+- [x] ~~Diálogos modales para:~~ ✅ **IMPLEMENTADO**
+  - [x] ~~Agregar comentarios~~ (`comentario-dialog.component`) ✅
+  - [x] ~~Transferir reclamos~~ (`transferencia-dialog.component`) ✅
+  - [x] ~~Concluir reclamos~~ (`conclusion-dialog.component`) ✅
 - [ ] Generación de PDFs (fichas de reclamo y trabajo)
 - [ ] Integración real con API de instalaciones para autocompletar datos
 - [ ] Carga de imágenes/fotos del reclamo

@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>
+  <mat-icon>comment</mat-icon>
+  Agregar Comentario
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Reclamo #{{ data.reclamoNumero }}
+  </p>
+
+  <form [formGroup]="comentarioForm" class="comentario-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Comentario o avance</mat-label>
+      <textarea
+        matInput
+        formControlName="comentario"
+        rows="6"
+        placeholder="Describe el avance, observaciones o acciones realizadas..."
+        [maxLength]="1000"></textarea>
+      <mat-hint align="start">{{ getErrorMessage() }}</mat-hint>
+      <mat-hint align="end">{{ getCharacterCount() }}</mat-hint>
+      <mat-error>{{ getErrorMessage() }}</mat-error>
+    </mat-form-field>
+
+    <div class="info-message">
+      <mat-icon>info</mat-icon>
+      <span>Este comentario quedará registrado en el historial del reclamo.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="submitting()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="!comentarioForm.valid || submitting()">
+    <mat-icon>send</mat-icon>
+    {{ submitting() ? 'Enviando...' : 'Agregar Comentario' }}
+  </button>
+</mat-dialog-actions>

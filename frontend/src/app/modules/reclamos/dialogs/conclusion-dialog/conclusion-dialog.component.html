@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>
+  <mat-icon>check_circle</mat-icon>
+  Concluir Reclamo
+</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    Reclamo #{{ data.reclamoNumero }}
+  </p>
+
+  <form [formGroup]="conclusionForm" class="conclusion-form">
+    <div class="procedencia-section">
+      <label class="section-label">¿El reclamo es procedente? *</label>
+      <mat-radio-group formControlName="procedente" class="radio-group">
+        <mat-radio-button [value]="true" class="procedente-si">
+          <mat-icon>check_circle</mat-icon>
+          <span>Sí, es procedente</span>
+        </mat-radio-button>
+        <mat-radio-button [value]="false" class="procedente-no">
+          <mat-icon>cancel</mat-icon>
+          <span>No, no es procedente</span>
+        </mat-radio-button>
+      </mat-radio-group>
+      @if (conclusionForm.get('procedente')?.touched && conclusionForm.get('procedente')?.hasError('required')) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          Debes seleccionar si el reclamo es procedente o no
+        </div>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Conclusión del reclamo</mat-label>
+      <textarea
+        matInput
+        formControlName="conclusion"
+        rows="6"
+        placeholder="Describe detalladamente la solución, acciones tomadas y resultado final..."
+        [maxLength]="1000"></textarea>
+      <mat-hint align="start">{{ getConclusionError() }}</mat-hint>
+      <mat-hint align="end">{{ getCharacterCount() }}</mat-hint>
+      <mat-error>{{ getConclusionError() }}</mat-error>
+    </mat-form-field>
+
+    <div class="warning-message">
+      <mat-icon>warning</mat-icon>
+      <div>
+        <strong>Atención:</strong> Al concluir el reclamo, este será marcado como <strong>CONCLUIDO</strong>
+        y no podrás realizar más acciones sobre él.
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="submitting()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="warn"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="!conclusionForm.valid || submitting()">
+    <mat-icon>{{ getProcedenteIcon() }}</mat-icon>
+    {{ submitting() ? 'Concluyendo...' : 'Concluir Reclamo' }}
+  </button>
+</mat-dialog-actions>
