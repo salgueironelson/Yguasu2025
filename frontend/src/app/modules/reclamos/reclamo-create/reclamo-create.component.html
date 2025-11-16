@@ -1,0 +1,154 @@
+<div class="create-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Nuevo Reclamo</h2>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="reclamoForm" (ngSubmit)="onSubmit()">
+
+        <!-- Toggle entre con/sin instalación -->
+        <div class="toggle-section">
+          <mat-checkbox
+            [checked]="tieneInstalacion()"
+            (change)="toggleTipoReclamo()">
+            El cliente tiene instalación registrada
+          </mat-checkbox>
+        </div>
+
+        <!-- Sección: Búsqueda de cliente (solo si tiene instalación) -->
+        @if (tieneInstalacion()) {
+          <div class="search-section">
+            <h3>Datos del Cliente</h3>
+            <div class="search-row">
+              <mat-form-field appearance="outline" class="codigo-field">
+                <mat-label>Código de Instalación</mat-label>
+                <input matInput formControlName="codigoInstalacion" type="number">
+                @if (reclamoForm.get('codigoInstalacion')?.hasError('required') && reclamoForm.get('codigoInstalacion')?.touched) {
+                  <mat-error>El código es requerido</mat-error>
+                }
+              </mat-form-field>
+
+              <button mat-raised-button color="primary" type="button" (click)="buscarCliente()">
+                <mat-icon>search</mat-icon>
+                Buscar
+              </button>
+            </div>
+
+            @if (datosCliente()) {
+              <div class="cliente-info">
+                <div class="info-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Nombre del Cliente</mat-label>
+                    <input matInput formControlName="nombreCliente">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Número de Medidor</mat-label>
+                    <input matInput formControlName="numeroMedidor">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Catastro</mat-label>
+                    <input matInput formControlName="catastro">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Categoría</mat-label>
+                    <input matInput formControlName="categoria">
+                  </mat-form-field>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Sección: Datos del Reclamo -->
+        <div class="reclamo-section">
+          <h3>Información del Reclamo</h3>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del Reclamante</mat-label>
+              <input matInput formControlName="reclamante">
+              @if (reclamoForm.get('reclamante')?.hasError('required') && reclamoForm.get('reclamante')?.touched) {
+                <mat-error>El nombre del reclamante es requerido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Número de Celular</mat-label>
+              <input matInput formControlName="celular" placeholder="Ej: 70123456">
+              @if (reclamoForm.get('celular')?.hasError('required') && reclamoForm.get('celular')?.touched) {
+                <mat-error>El celular es requerido</mat-error>
+              }
+              @if (reclamoForm.get('celular')?.hasError('pattern') && reclamoForm.get('celular')?.touched) {
+                <mat-error>Ingrese un número válido (7-8 dígitos)</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Reclamo</mat-label>
+              <mat-select formControlName="tipoReclamo">
+                @for (tipo of tiposReclamo; track tipo.value) {
+                  <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+                }
+              </mat-select>
+              @if (reclamoForm.get('tipoReclamo')?.hasError('required') && reclamoForm.get('tipoReclamo')?.touched) {
+                <mat-error>El tipo de reclamo es requerido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha del Reclamo</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fechaReclamo">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Ubicación</mat-label>
+              <input matInput formControlName="ubicacion" placeholder="Dirección o referencia">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Detalle del Reclamo</mat-label>
+              <textarea
+                matInput
+                formControlName="detalle"
+                rows="4"
+                placeholder="Describa el problema en detalle..."></textarea>
+              @if (reclamoForm.get('detalle')?.hasError('required') && reclamoForm.get('detalle')?.touched) {
+                <mat-error>El detalle es requerido</mat-error>
+              }
+              @if (reclamoForm.get('detalle')?.hasError('minlength') && reclamoForm.get('detalle')?.touched) {
+                <mat-error>El detalle debe tener al menos 10 caracteres</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="actions">
+          <button mat-button type="button" (click)="cancelar()">
+            Cancelar
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="loading()">
+            @if (loading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>save</mat-icon>
+              Guardar Reclamo
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
