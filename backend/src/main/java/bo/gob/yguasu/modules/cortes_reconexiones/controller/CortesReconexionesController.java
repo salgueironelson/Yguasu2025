@@ -154,4 +154,86 @@ public class CortesReconexionesController {
                         .build()
         );
     }
+
+    /**
+     * Lista todos los plomeros activos
+     */
+    @GetMapping("/plomeros")
+    @Operation(summary = "Listar plomeros activos",
+               description = "Obtiene el listado de plomeros activos para asignar a cortes")
+    public ResponseEntity<ApiResponse<List<PlomeroDTO>>> listarPlomeros() {
+        List<PlomeroDTO> plomeros = cortesReconexionesService.listarPlomerosActivos();
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<PlomeroDTO>>builder()
+                        .success(true)
+                        .message("Plomeros obtenidos exitosamente")
+                        .data(plomeros)
+                        .build()
+        );
+    }
+
+    /**
+     * Busca instalaciones con deuda según filtros
+     */
+    @PostMapping("/buscar-deudores")
+    @Operation(summary = "Buscar instalaciones con deuda",
+               description = "Busca instalaciones que cumplan con los criterios de deuda para corte masivo")
+    public ResponseEntity<ApiResponse<List<InstalacionConDeudaDTO>>> buscarDeudores(
+            @Valid @RequestBody FiltrosCorteMasivoDTO filtros) {
+
+        try {
+            List<InstalacionConDeudaDTO> instalaciones =
+                cortesReconexionesService.buscarInstalacionesConDeuda(filtros);
+
+            return ResponseEntity.ok(
+                    ApiResponse.<List<InstalacionConDeudaDTO>>builder()
+                            .success(true)
+                            .message("Búsqueda completada. Se encontraron " + instalaciones.size() + " instalaciones")
+                            .data(instalaciones)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.<List<InstalacionConDeudaDTO>>builder()
+                            .success(false)
+                            .message("Error en la búsqueda: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    /**
+     * Realiza corte masivo de servicios
+     */
+    @PostMapping("/corte-masivo")
+    @Operation(summary = "Corte masivo de servicios",
+               description = "Realiza el corte de múltiples instalaciones seleccionadas")
+    public ResponseEntity<ApiResponse<CorteMasivoResponseDTO>> corteMasivo(
+            @Valid @RequestBody CorteMasivoRequestDTO request) {
+
+        try {
+            // TODO: Obtener ID de usuario del contexto de seguridad
+            Integer idUsuario = 1; // Temporal
+
+            CorteMasivoResponseDTO resultado =
+                cortesReconexionesService.cortarServicioMasivo(request, idUsuario);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    ApiResponse.<CorteMasivoResponseDTO>builder()
+                            .success(true)
+                            .message("Corte masivo completado. Exitosos: " + resultado.getTotalExitosos() +
+                                    ", Fallidos: " + resultado.getTotalFallidos())
+                            .data(resultado)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.<CorteMasivoResponseDTO>builder()
+                            .success(false)
+                            .message("Error en corte masivo: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
 }

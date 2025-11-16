@@ -9,6 +9,7 @@ export interface CorteCreate {
   codigoInstalacion: number;
   motivo: string;
   observaciones?: string;
+  idPlomero?: number;
 }
 
 /**
@@ -31,6 +32,8 @@ export interface Corte {
   fechaCorte: string;
   motivo: string;
   observaciones?: string;
+  idPlomero?: number;
+  nombrePlomero?: string;
   usuarioRegistro: string;
   estado: string;
 }
@@ -101,3 +104,60 @@ export type MotivoCorte = typeof MOTIVOS_CORTE[number];
  * Tipo para motivos de reconexión
  */
 export type MotivoReconexion = typeof MOTIVOS_RECONEXION[number];
+
+/**
+ * DTO para plomero
+ */
+export interface Plomero {
+  idPlomero: number;
+  nombreCompleto: string;
+  dni: string;
+  direccion?: string;
+  celular?: string;
+  estado: string;
+}
+
+/**
+ * DTO para filtros de corte masivo
+ */
+export interface FiltrosCorteMasivo {
+  zonaInicial: string;
+  zonaFinal: string;
+  cantidadFacturas: number;
+}
+
+/**
+ * DTO para instalación con deuda
+ */
+export interface InstalacionConDeuda {
+  idInstalacion: number;
+  codigoInstalacion: number;
+  nombreCliente: string;
+  direccion: string;
+  zona: string;
+  cantidadFacturasAdeudadas: number;
+  montoDeuda: number;
+  estado: string;
+  seleccionada?: boolean;
+}
+
+/**
+ * DTO para request de corte masivo
+ */
+export interface CorteMasivoRequest {
+  idPlomero: number;
+  idsInstalaciones: number[];
+  motivo: string;
+  observaciones?: string;
+}
+
+/**
+ * DTO para response de corte masivo
+ */
+export interface CorteMasivoResponse {
+  totalProcesados: number;
+  totalExitosos: number;
+  totalFallidos: number;
+  cortesRealizados: Corte[];
+  errores: string[];
+}

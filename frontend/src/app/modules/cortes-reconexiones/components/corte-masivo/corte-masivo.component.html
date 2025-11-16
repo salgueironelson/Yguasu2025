@@ -1,0 +1,235 @@
+<div class="corte-masivo-container">
+  <h1 class="page-title">
+    <mat-icon>content_cut</mat-icon>
+    Corte Masivo de Servicios
+  </h1>
+
+  <!-- Formulario de Filtros -->
+  <mat-card class="filtros-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtros de Búsqueda
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filtrosForm" class="filtros-form">
+        <div class="filtros-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Zona Inicial</mat-label>
+            <input matInput formControlName="zonaInicial" placeholder="Ej: 1">
+            <mat-icon matPrefix>location_on</mat-icon>
+            <mat-error *ngIf="filtrosForm.get('zonaInicial')?.hasError('required')">
+              La zona inicial es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Zona Final</mat-label>
+            <input matInput formControlName="zonaFinal" placeholder="Ej: 5">
+            <mat-icon matPrefix>location_on</mat-icon>
+            <mat-error *ngIf="filtrosForm.get('zonaFinal')?.hasError('required')">
+              La zona final es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cantidad Mínima de Facturas Adeudadas</mat-label>
+            <input matInput type="number" formControlName="cantidadFacturas" placeholder="Ej: 3">
+            <mat-icon matPrefix>receipt_long</mat-icon>
+            <mat-error *ngIf="filtrosForm.get('cantidadFacturas')?.hasError('required')">
+              La cantidad es requerida
+            </mat-error>
+            <mat-error *ngIf="filtrosForm.get('cantidadFacturas')?.hasError('min')">
+              La cantidad debe ser mayor a 0
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="filtros-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onBuscarInstalaciones()"
+            [disabled]="loadingInstalaciones() || filtrosForm.invalid">
+            @if (loadingInstalaciones()) {
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Buscando...</span>
+            } @else {
+              <mat-icon>search</mat-icon>
+              <span>Buscar Instalaciones</span>
+            }
+          </button>
+          <button
+            mat-button
+            (click)="onLimpiar()"
+            [disabled]="loadingInstalaciones()">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Resultados y Corte Masivo -->
+  @if (instalaciones().length > 0) {
+    <mat-card class="resultados-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>list</mat-icon>
+          Instalaciones Encontradas ({{ instalaciones().length }})
+        </mat-card-title>
+        <div class="card-subtitle">
+          Seleccionadas: {{ selection.selected.length }}
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Formulario de Corte -->
+        <form [formGroup]="corteForm" class="corte-form">
+          <div class="corte-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Plomero Asignado</mat-label>
+              <mat-select formControlName="idPlomero">
+                @if (loadingPlomeros()) {
+                  <mat-option disabled>
+                    Cargando plomeros...
+                  </mat-option>
+                }
+                @for (plomero of plomeros(); track plomero.idPlomero) {
+                  <mat-option [value]="plomero.idPlomero">
+                    {{ plomero.nombreCompleto }} - {{ plomero.dni }}
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>engineering</mat-icon>
+              <mat-error *ngIf="corteForm.get('idPlomero')?.hasError('required')">
+                Debe seleccionar un plomero
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Motivo del Corte</mat-label>
+              <mat-select formControlName="motivo">
+                @for (motivo of motivos; track motivo) {
+                  <mat-option [value]="motivo">
+                    {{ motivo }}
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>help_outline</mat-icon>
+              <mat-error *ngIf="corteForm.get('motivo')?.hasError('required')">
+                El motivo es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observaciones</mat-label>
+            <textarea
+              matInput
+              formControlName="observaciones"
+              rows="2"
+              placeholder="Ingrese observaciones (opcional)">
+            </textarea>
+            <mat-icon matPrefix>notes</mat-icon>
+          </mat-form-field>
+
+          <div class="corte-actions">
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="onProcesarCorte()"
+              [disabled]="procesandoCorte() || corteForm.invalid || selection.selected.length === 0">
+              @if (procesandoCorte()) {
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Procesando...</span>
+              } @else {
+                <mat-icon>power_off</mat-icon>
+                <span>Cortar {{ selection.selected.length }} Instalaciones</span>
+              }
+            </button>
+          </div>
+        </form>
+
+        <!-- Tabla de Instalaciones -->
+        <div class="table-container">
+          <table mat-table [dataSource]="instalaciones()" class="instalaciones-table">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                  (change)="$event ? toggleAllRows() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()"
+                  [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox
+                  (click)="$event.stopPropagation()"
+                  (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)"
+                  [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Código -->
+            <ng-container matColumnDef="codigoInstalacion">
+              <th mat-header-cell *matHeaderCellDef>Código</th>
+              <td mat-cell *matCellDef="let element">{{ element.codigoInstalacion }}</td>
+            </ng-container>
+
+            <!-- Cliente -->
+            <ng-container matColumnDef="nombreCliente">
+              <th mat-header-cell *matHeaderCellDef>Cliente</th>
+              <td mat-cell *matCellDef="let element">{{ element.nombreCliente }}</td>
+            </ng-container>
+
+            <!-- Dirección -->
+            <ng-container matColumnDef="direccion">
+              <th mat-header-cell *matHeaderCellDef>Dirección</th>
+              <td mat-cell *matCellDef="let element">{{ element.direccion }}</td>
+            </ng-container>
+
+            <!-- Zona -->
+            <ng-container matColumnDef="zona">
+              <th mat-header-cell *matHeaderCellDef>Zona</th>
+              <td mat-cell *matCellDef="let element">{{ element.zona }}</td>
+            </ng-container>
+
+            <!-- Facturas Adeudadas -->
+            <ng-container matColumnDef="cantidadFacturasAdeudadas">
+              <th mat-header-cell *matHeaderCellDef>Facturas Adeudadas</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="badge-deuda">{{ element.cantidadFacturasAdeudadas }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Monto Deuda -->
+            <ng-container matColumnDef="montoDeuda">
+              <th mat-header-cell *matHeaderCellDef>Monto Deuda</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="monto-deuda">Bs. {{ element.montoDeuda | number:'1.2-2' }}</span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="selection.toggle(row)"
+                [class.selected-row]="selection.isSelected(row)">
+            </tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

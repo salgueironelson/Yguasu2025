@@ -36,6 +36,9 @@ public class Corte {
     @Column(name = "observaciones", length = 500)
     private String observaciones;
 
+    @Column(name = "id_plomero")
+    private Integer idPlomero;
+
     @Column(name = "id_usuario")
     private Integer idUsuario;
 

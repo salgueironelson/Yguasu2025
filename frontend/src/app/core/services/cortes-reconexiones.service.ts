@@ -7,7 +7,12 @@ import {
   ReconexionCreate,
   Corte,
   Reconexion,
-  HistorialCortesReconexiones
+  HistorialCortesReconexiones,
+  Plomero,
+  FiltrosCorteMasivo,
+  InstalacionConDeuda,
+  CorteMasivoRequest,
+  CorteMasivoResponse
 } from '../../shared/models/cortes-reconexiones.model';
 import { ApiResponse } from '../../shared/models/api-response.model';
 
@@ -57,5 +62,32 @@ export class CortesReconexionesService {
    */
   listarReconexiones(): Observable<ApiResponse<Reconexion[]>> {
     return this.http.get<ApiResponse<Reconexion[]>>(`${this.apiUrl}/reconexiones`);
+  }
+
+  /**
+   * Lista todos los plomeros activos
+   */
+  listarPlomerosActivos(): Observable<ApiResponse<Plomero[]>> {
+    return this.http.get<ApiResponse<Plomero[]>>(`${this.apiUrl}/plomeros`);
+  }
+
+  /**
+   * Busca instalaciones con deuda según filtros
+   */
+  buscarInstalacionesConDeuda(filtros: FiltrosCorteMasivo): Observable<ApiResponse<InstalacionConDeuda[]>> {
+    return this.http.post<ApiResponse<InstalacionConDeuda[]>>(
+      `${this.apiUrl}/buscar-deudores`,
+      filtros
+    );
+  }
+
+  /**
+   * Realiza corte masivo de servicios
+   */
+  corteMasivo(request: CorteMasivoRequest): Observable<ApiResponse<CorteMasivoResponse>> {
+    return this.http.post<ApiResponse<CorteMasivoResponse>>(
+      `${this.apiUrl}/corte-masivo`,
+      request
+    );
   }
 }

@@ -26,4 +26,6 @@ public class CorteCreateDTO {
 
     @Size(max = 500, message = "Las observaciones no pueden exceder 500 caracteres")
     private String observaciones;
+
+    private Integer idPlomero;
 }

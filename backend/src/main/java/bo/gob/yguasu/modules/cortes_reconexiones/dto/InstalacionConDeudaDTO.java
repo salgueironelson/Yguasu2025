@@ -4,26 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.math.BigDecimal;
 
 /**
- * DTO para respuesta de corte
+ * DTO para instalación con información de deuda
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CorteDTO {
-
-    private Integer idCorte;
+public class InstalacionConDeudaDTO {
     private Integer idInstalacion;
     private Integer codigoInstalacion;
     private String nombreCliente;
-    private LocalDateTime fechaCorte;
-    private String motivo;
-    private String observaciones;
-    private Integer idPlomero;
-    private String nombrePlomero;
-    private String usuarioRegistro;
+    private String direccion;
+    private String zona;
+    private Integer cantidadFacturasAdeudadas;
+    private BigDecimal montoDeuda;
     private String estado;
 }
