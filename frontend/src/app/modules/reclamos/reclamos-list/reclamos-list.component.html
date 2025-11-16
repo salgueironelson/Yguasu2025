@@ -1,0 +1,289 @@
+<div class="list-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <div class="header-title">
+          <h2>Gestión de Reclamos</h2>
+          <div class="header-actions">
+            <button mat-raised-button color="primary" (click)="crearNuevo()">
+              <mat-icon>add</mat-icon>
+              Nuevo Reclamo
+            </button>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Barra de filtros -->
+      <div class="filtros-bar">
+        <button mat-stroked-button (click)="toggleFiltros()">
+          <mat-icon>{{ mostrarFiltros() ? 'expand_less' : 'filter_list' }}</mat-icon>
+          {{ mostrarFiltros() ? 'Ocultar Filtros' : 'Mostrar Filtros' }}
+        </button>
+
+        <div class="total-info">
+          <mat-chip-set>
+            <mat-chip>Total: {{ totalElements() }} reclamos</mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+
+      <!-- Panel de filtros -->
+      @if (mostrarFiltros()) {
+        <div class="filtros-panel">
+          <form [formGroup]="filtrosForm" (ngSubmit)="aplicarFiltros()">
+            <div class="filtros-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Búsqueda</mat-label>
+                <input
+                  matInput
+                  formControlName="busqueda"
+                  placeholder="Código, nombre o medidor">
+                <mat-icon matPrefix>search</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Tipo de Reclamo</mat-label>
+                <mat-select formControlName="tipoReclamo">
+                  <mat-option value="">Todos</mat-option>
+                  @for (tipo of tiposReclamo; track tipo.value) {
+                    <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="estado">
+                  <mat-option value="">Todos</mat-option>
+                  @for (estado of estadosReclamo; track estado.value) {
+                    <mat-option [value]="estado.value">{{ estado.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Procedencia</mat-label>
+                <mat-select formControlName="procedente">
+                  <mat-option value="">Todos</mat-option>
+                  <mat-option value="SI">Procedente</mat-option>
+                  <mat-option value="NO">No Procedente</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Fecha Desde</mat-label>
+                <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+                <mat-datepicker #pickerDesde></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Fecha Hasta</mat-label>
+                <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+                <mat-datepicker #pickerHasta></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="filtros-actions">
+              <button mat-button type="button" (click)="limpiarFiltros()">
+                <mat-icon>clear</mat-icon>
+                Limpiar
+              </button>
+              <button mat-raised-button color="primary" type="submit">
+                <mat-icon>search</mat-icon>
+                Buscar
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      <!-- Loading -->
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      }
+
+      <!-- Tabla de reclamos -->
+      @if (!loading()) {
+        <div class="table-container">
+          <table mat-table [dataSource]="reclamos()" class="full-width">
+
+            <!-- Columna: Número -->
+            <ng-container matColumnDef="numero">
+              <th mat-header-cell *matHeaderCellDef>N°</th>
+              <td mat-cell *matCellDef="let reclamo">
+                <strong>{{ reclamo.numero }}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Columna: Código Instalación -->
+            <ng-container matColumnDef="codigoInstalacion">
+              <th mat-header-cell *matHeaderCellDef>Código</th>
+              <td mat-cell *matCellDef="let reclamo">
+                {{ reclamo.codigoInstalacion || '-' }}
+              </td>
+            </ng-container>
+
+            <!-- Columna: Reclamante -->
+            <ng-container matColumnDef="reclamante">
+              <th mat-header-cell *matHeaderCellDef>Reclamante</th>
+              <td mat-cell *matCellDef="let reclamo">
+                <div class="reclamante-cell">
+                  <span class="nombre">{{ reclamo.reclamante || reclamo.nombreCliente }}</span>
+                  @if (reclamo.celular) {
+                    <span class="celular">
+                      <mat-icon class="icon-sm">phone</mat-icon>
+                      {{ reclamo.celular }}
+                    </span>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna: Tipo Reclamo -->
+            <ng-container matColumnDef="tipoReclamo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let reclamo">
+                {{ getTipoReclamoLabel(reclamo.tipoReclamo) }}
+              </td>
+            </ng-container>
+
+            <!-- Columna: Fecha -->
+            <ng-container matColumnDef="fechaReclamo">
+              <th mat-header-cell *matHeaderCellDef>Fecha</th>
+              <td mat-cell *matCellDef="let reclamo">
+                {{ formatFecha(reclamo.fechaReclamo) }}
+              </td>
+            </ng-container>
+
+            <!-- Columna: Estado -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let reclamo">
+                <mat-chip-set>
+                  <mat-chip [class]="'estado-' + reclamo.estado?.toLowerCase()">
+                    {{ getEstadoLabel(reclamo.estado) }}
+                  </mat-chip>
+                </mat-chip-set>
+              </td>
+            </ng-container>
+
+            <!-- Columna: Procedente -->
+            <ng-container matColumnDef="procedente">
+              <th mat-header-cell *matHeaderCellDef>Procedencia</th>
+              <td mat-cell *matCellDef="let reclamo">
+                @if (reclamo.procedente === 'SI') {
+                  <mat-chip class="procedente-si">
+                    <mat-icon class="icon-sm">check_circle</mat-icon>
+                    Procedente
+                  </mat-chip>
+                } @else if (reclamo.procedente === 'NO') {
+                  <mat-chip class="procedente-no">
+                    <mat-icon class="icon-sm">cancel</mat-icon>
+                    No Procedente
+                  </mat-chip>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+            </ng-container>
+
+            <!-- Columna: Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let reclamo">
+                <div class="acciones-cell">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    [matTooltip]="'Ver Detalle'"
+                    (click)="verDetalle(reclamo)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                    [matTooltip]="'Más acciones'">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #menu="matMenu">
+                    <button
+                      mat-menu-item
+                      [disabled]="!puedeAgregarComentario(reclamo)"
+                      (click)="agregarComentario(reclamo)">
+                      <mat-icon>comment</mat-icon>
+                      <span>Agregar Comentario</span>
+                    </button>
+
+                    <button
+                      mat-menu-item
+                      [disabled]="!puedeTransferir(reclamo)"
+                      (click)="transferir(reclamo)">
+                      <mat-icon>send</mat-icon>
+                      <span>Transferir</span>
+                    </button>
+
+                    <button
+                      mat-menu-item
+                      [disabled]="!puedeConcluir(reclamo)"
+                      (click)="concluir(reclamo)">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Concluir</span>
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button mat-menu-item (click)="imprimirFicha(reclamo)">
+                      <mat-icon>print</mat-icon>
+                      <span>Imprimir Ficha</span>
+                    </button>
+
+                    <button mat-menu-item (click)="imprimirFichaTrabajo(reclamo)">
+                      <mat-icon>description</mat-icon>
+                      <span>Ficha de Trabajo</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns;"
+              class="table-row"></tr>
+          </table>
+
+          @if (reclamos().length === 0) {
+            <div class="no-data">
+              <mat-icon>inbox</mat-icon>
+              <p>No se encontraron reclamos</p>
+              <button mat-raised-button color="primary" (click)="crearNuevo()">
+                Crear Primer Reclamo
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Paginador -->
+        @if (reclamos().length > 0) {
+          <mat-paginator
+            [length]="totalElements()"
+            [pageSize]="pageSize()"
+            [pageIndex]="pageIndex()"
+            [pageSizeOptions]="[5, 10, 20, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

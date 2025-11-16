@@ -1,0 +1,272 @@
+<div class="detail-container">
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else if (reclamo()) {
+    <!-- Encabezado con acciones -->
+    <div class="detail-header">
+      <button mat-icon-button (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>Reclamo #{{ reclamo()?.numero }}</h2>
+      <div class="header-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="!puedeAgregarComentario()"
+          (click)="agregarComentario()">
+          <mat-icon>comment</mat-icon>
+          Comentar
+        </button>
+        <button
+          mat-raised-button
+          color="accent"
+          [disabled]="!puedeTransferir()"
+          (click)="transferir()">
+          <mat-icon>send</mat-icon>
+          Transferir
+        </button>
+        <button
+          mat-raised-button
+          color="warn"
+          [disabled]="!puedeConcluir()"
+          (click)="concluir()">
+          <mat-icon>check_circle</mat-icon>
+          Concluir
+        </button>
+        <button mat-stroked-button (click)="imprimirFicha()">
+          <mat-icon>print</mat-icon>
+          Ficha
+        </button>
+        <button mat-stroked-button (click)="imprimirFichaTrabajo()">
+          <mat-icon>description</mat-icon>
+          Ficha Trabajo
+        </button>
+      </div>
+    </div>
+
+    <!-- Información del Reclamo -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <div class="card-title-with-status">
+            <span>Información del Reclamo</span>
+            <mat-chip-set>
+              <mat-chip [class]="getEstadoClass(reclamo()?.estado)">
+                {{ reclamo()?.estado }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="info-grid">
+          <!-- Datos del Cliente -->
+          @if (reclamo()?.codigoInstalacion) {
+            <div class="info-section">
+              <h3>Datos del Cliente</h3>
+              <mat-divider></mat-divider>
+
+              <div class="info-row">
+                <label>Código de Instalación:</label>
+                <span class="value">{{ reclamo()?.codigoInstalacion }}</span>
+              </div>
+
+              @if (reclamo()?.nombreCliente) {
+                <div class="info-row">
+                  <label>Nombre:</label>
+                  <span class="value">{{ reclamo()?.nombreCliente }}</span>
+                </div>
+              }
+
+              @if (reclamo()?.numeroMedidor) {
+                <div class="info-row">
+                  <label>Medidor:</label>
+                  <span class="value">{{ reclamo()?.numeroMedidor }}</span>
+                </div>
+              }
+
+              @if (reclamo()?.catastro) {
+                <div class="info-row">
+                  <label>Catastro:</label>
+                  <span class="value">{{ reclamo()?.catastro }}</span>
+                </div>
+              }
+
+              @if (reclamo()?.categoria) {
+                <div class="info-row">
+                  <label>Categoría:</label>
+                  <span class="value">{{ reclamo()?.categoria }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Datos del Reclamante -->
+          <div class="info-section">
+            <h3>Datos del Reclamante</h3>
+            <mat-divider></mat-divider>
+
+            <div class="info-row">
+              <label>Nombre:</label>
+              <span class="value">{{ reclamo()?.reclamante }}</span>
+            </div>
+
+            <div class="info-row">
+              <label>Celular:</label>
+              <span class="value">
+                <mat-icon class="icon-inline">phone</mat-icon>
+                {{ reclamo()?.celular }}
+              </span>
+            </div>
+
+            @if (reclamo()?.ubicacion) {
+              <div class="info-row">
+                <label>Ubicación:</label>
+                <span class="value">
+                  <mat-icon class="icon-inline">location_on</mat-icon>
+                  {{ reclamo()?.ubicacion }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Detalles del Reclamo -->
+          <div class="info-section full-width">
+            <h3>Detalles del Reclamo</h3>
+            <mat-divider></mat-divider>
+
+            <div class="info-row">
+              <label>Tipo de Reclamo:</label>
+              <span class="value">{{ reclamo()?.tipoReclamo }}</span>
+            </div>
+
+            <div class="info-row">
+              <label>Fecha del Reclamo:</label>
+              <span class="value">{{ formatFecha(reclamo()?.fechaReclamo) }}</span>
+            </div>
+
+            @if (reclamo()?.departamento) {
+              <div class="info-row">
+                <label>Departamento:</label>
+                <span class="value">{{ reclamo()?.departamento }}</span>
+              </div>
+            }
+
+            <div class="info-row">
+              <label>Detalle:</label>
+              <p class="detalle-text">{{ reclamo()?.detalle }}</p>
+            </div>
+          </div>
+
+          <!-- Estado de Conclusión -->
+          @if (reclamo()?.estado === 'CONCLUIDO') {
+            <div class="info-section full-width conclusion-section">
+              <h3>Conclusión</h3>
+              <mat-divider></mat-divider>
+
+              <div class="info-row">
+                <label>Procedencia:</label>
+                @if (reclamo()?.procedente === 'SI') {
+                  <mat-chip class="procedente-si">
+                    <mat-icon>check_circle</mat-icon>
+                    Procedente
+                  </mat-chip>
+                } @else {
+                  <mat-chip class="procedente-no">
+                    <mat-icon>cancel</mat-icon>
+                    No Procedente
+                  </mat-chip>
+                }
+              </div>
+
+              <div class="info-row">
+                <label>Fecha de Solución:</label>
+                <span class="value">{{ formatFecha(reclamo()?.fechaSolucion) }}</span>
+              </div>
+
+              <div class="info-row">
+                <label>Conclusión:</label>
+                <p class="detalle-text">{{ reclamo()?.conclusion }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Historial -->
+    <mat-card class="historial-card">
+      <mat-card-header>
+        <mat-card-title>Historial de Acciones</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (loadingHistorial()) {
+          <div class="loading-historial">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+        } @else if (historial().length > 0) {
+          <mat-accordion class="historial-timeline">
+            @for (paso of historial(); track paso.id; let i = $index) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <div class="paso-header">
+                      <mat-icon [color]="getTipoPasoColor(paso.tipoPaso)">
+                        {{ getTipoPasoIcon(paso.tipoPaso) }}
+                      </mat-icon>
+                      <span class="paso-titulo">
+                        Paso {{ paso.paso }}: {{ paso.detalle }}
+                      </span>
+                      <span class="paso-fecha">
+                        {{ formatFecha(paso.fechaRegistro) }}
+                      </span>
+                    </div>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="paso-content">
+                  @if (paso.comentario) {
+                    <div class="paso-comentario">
+                      <mat-icon>comment</mat-icon>
+                      <p>{{ paso.comentario }}</p>
+                    </div>
+                  }
+
+                  <div class="paso-info">
+                    <div class="info-item">
+                      <mat-icon>person</mat-icon>
+                      <span>Usuario: {{ paso.nombreUsuario || paso.usuario }}</span>
+                    </div>
+
+                    @if (paso.usuarioDestino) {
+                      <div class="info-item">
+                        <mat-icon>send</mat-icon>
+                        <span>Destino: {{ paso.nombreUsuarioDestino || paso.usuarioDestino }}</span>
+                      </div>
+                    }
+
+                    @if (paso.fechaFin) {
+                      <div class="info-item">
+                        <mat-icon>event</mat-icon>
+                        <span>Finalizado: {{ formatFecha(paso.fechaFin) }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        } @else {
+          <div class="no-historial">
+            <mat-icon>history</mat-icon>
+            <p>No hay historial disponible</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
