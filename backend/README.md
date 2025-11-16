@@ -1,11 +1,11 @@
 # Yguasu Backend - Sistema de Gestión de Servicios Públicos
 
-Backend desarrollado con Spring Boot 3.2 para la gestión de servicios públicos de agua y alcantarillado.
+Backend desarrollado con Spring Boot 3.3.5 para la gestión de servicios públicos de agua y alcantarillado.
 
 ## Tecnologías
 
-- **Java 17**
-- **Spring Boot 3.2.0**
+- **Java 21**
+- **Spring Boot 3.3.5**
 - **Spring Data JPA** - Persistencia de datos
 - **Spring Security** - Seguridad y autenticación
 - **PostgreSQL** - Base de datos

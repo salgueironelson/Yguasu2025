@@ -17,8 +17,8 @@ Yguasu es una solución completa que permite gestionar todos los aspectos relaci
 ## Stack Tecnológico
 
 ### Backend
-- **Java 17**
-- **Spring Boot 3.2.0**
+- **Java 21**
+- **Spring Boot 3.3.5**
 - **Spring Security** con JWT
 - **Spring Data JPA**
 - **PostgreSQL**
@@ -130,8 +130,8 @@ Yguasu2025/
 ## Requisitos Previos
 
 ### Backend
-- Java JDK 17 o superior
-- Maven 3.8+
+- Java JDK 21 o superior
+- Maven 3.9+
 - PostgreSQL 13+
 
 ### Frontend
