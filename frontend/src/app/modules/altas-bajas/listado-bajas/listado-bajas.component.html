@@ -1,0 +1,111 @@
+<div class="listado-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>block</mat-icon>
+        Listado de Bajas
+      </mat-card-title>
+      <mat-card-subtitle>
+        Registro completo de bajas de instalaciones
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filtro de búsqueda -->
+      <div class="filter-section">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Buscar</mat-label>
+          <input
+            matInput
+            placeholder="Código, cliente o motivo..."
+            (keyup)="aplicarFiltro($event)">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Loading -->
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Cargando bajas...</p>
+        </div>
+      }
+
+      <!-- Tabla -->
+      @if (!loading() && bajasFiltradas().length > 0) {
+        <div class="table-container">
+          <table mat-table [dataSource]="bajasFiltradas()" class="bajas-table">
+            <!-- ID Baja -->
+            <ng-container matColumnDef="idBaja">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let baja">{{ baja.idBaja }}</td>
+            </ng-container>
+
+            <!-- Código Instalación -->
+            <ng-container matColumnDef="codigoInstalacion">
+              <th mat-header-cell *matHeaderCellDef>Instalación</th>
+              <td mat-cell *matCellDef="let baja">
+                <strong>{{ baja.codigoInstalacion }}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Cliente -->
+            <ng-container matColumnDef="nombreCliente">
+              <th mat-header-cell *matHeaderCellDef>Cliente</th>
+              <td mat-cell *matCellDef="let baja">{{ baja.nombreCliente }}</td>
+            </ng-container>
+
+            <!-- Fecha Baja -->
+            <ng-container matColumnDef="fechaBaja">
+              <th mat-header-cell *matHeaderCellDef>Fecha de Baja</th>
+              <td mat-cell *matCellDef="let baja">{{ formatFecha(baja.fechaBaja) }}</td>
+            </ng-container>
+
+            <!-- Motivo -->
+            <ng-container matColumnDef="motivo">
+              <th mat-header-cell *matHeaderCellDef>Motivo</th>
+              <td mat-cell *matCellDef="let baja">
+                <mat-chip class="motivo-chip">{{ getMotivoLabel(baja.motivo) }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Usuario Registro -->
+            <ng-container matColumnDef="usuarioRegistro">
+              <th mat-header-cell *matHeaderCellDef>Registrado por</th>
+              <td mat-cell *matCellDef="let baja">{{ baja.usuarioRegistro || '-' }}</td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let baja">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="verHistorial(baja)"
+                  matTooltip="Ver historial completo">
+                  <mat-icon>history</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <div class="total-registros">
+            Total: <strong>{{ bajasFiltradas().length }}</strong> bajas registradas
+          </div>
+        </div>
+      }
+
+      <!-- Sin resultados -->
+      @if (!loading() && bajasFiltradas().length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <p>No se encontraron bajas</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

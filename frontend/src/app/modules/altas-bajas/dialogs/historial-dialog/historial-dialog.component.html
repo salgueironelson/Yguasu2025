@@ -1,0 +1,155 @@
+<div class="historial-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>history</mat-icon>
+    Historial de Altas y Bajas
+  </h2>
+
+  <mat-dialog-content>
+    <!-- Información del Cliente -->
+    <div class="cliente-header">
+      <div class="cliente-info">
+        <div class="info-row">
+          <span class="label">Instalación:</span>
+          <span class="value"><strong>{{ data.codigoInstalacion }}</strong></span>
+        </div>
+        @if (data.nombreCliente) {
+          <div class="info-row">
+            <span class="label">Cliente:</span>
+            <span class="value">{{ data.nombreCliente }}</span>
+          </div>
+        }
+        @if (historial()) {
+          <div class="info-row">
+            <span class="label">Estado Actual:</span>
+            <span class="value">
+              <mat-chip [color]="getEstadoActualColor()" highlighted>
+                {{ getEstadoActualLabel() }}
+              </mat-chip>
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Estadísticas -->
+      @if (!loading()) {
+        <div class="estadisticas">
+          <div class="stat-card altas">
+            <mat-icon>check_circle</mat-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalAltas() }}</span>
+              <span class="stat-label">Altas</span>
+            </div>
+          </div>
+          <div class="stat-card bajas">
+            <mat-icon>block</mat-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalBajas() }}</span>
+              <span class="stat-label">Bajas</span>
+            </div>
+          </div>
+          <div class="stat-card total">
+            <mat-icon>swap_vert</mat-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalAltas() + totalBajas() }}</span>
+              <span class="stat-label">Total Movimientos</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando historial...</p>
+      </div>
+    }
+
+    <!-- Timeline -->
+    @if (!loading() && timeline().length > 0) {
+      <div class="timeline-container">
+        <h3>Línea de Tiempo</h3>
+        <div class="timeline">
+          @for (movimiento of timeline(); track movimiento.id) {
+            <div class="timeline-item" [class.alta]="movimiento.tipo === 'ALTA'" [class.baja]="movimiento.tipo === 'BAJA'">
+              <div class="timeline-marker">
+                @if (movimiento.tipo === 'ALTA') {
+                  <mat-icon class="icon-alta">check_circle</mat-icon>
+                } @else {
+                  <mat-icon class="icon-baja">block</mat-icon>
+                }
+              </div>
+              <div class="timeline-content">
+                <mat-card>
+                  <mat-card-header>
+                    <div class="card-header-content">
+                      <div class="tipo-badge" [class.tipo-alta]="movimiento.tipo === 'ALTA'" [class.tipo-baja]="movimiento.tipo === 'BAJA'">
+                        <mat-icon>{{ movimiento.tipo === 'ALTA' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                        {{ movimiento.tipo === 'ALTA' ? 'ALTA' : 'BAJA' }}
+                      </div>
+                      <span class="fecha-badge">{{ formatFechaCorta(movimiento.fecha) }}</span>
+                    </div>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="movimiento-details">
+                      <div class="detail-row">
+                        <mat-icon>event</mat-icon>
+                        <div class="detail-content">
+                          <span class="detail-label">Fecha y Hora:</span>
+                          <span class="detail-value">{{ formatFecha(movimiento.fecha) }}</span>
+                        </div>
+                      </div>
+                      <div class="detail-row">
+                        <mat-icon>label</mat-icon>
+                        <div class="detail-content">
+                          <span class="detail-label">Motivo:</span>
+                          <span class="detail-value">{{ getMotivoLabel(movimiento.motivo) }}</span>
+                        </div>
+                      </div>
+                      @if (movimiento.observaciones) {
+                        <div class="detail-row">
+                          <mat-icon>notes</mat-icon>
+                          <div class="detail-content">
+                            <span class="detail-label">Observaciones:</span>
+                            <span class="detail-value">{{ movimiento.observaciones }}</span>
+                          </div>
+                        </div>
+                      }
+                      @if (movimiento.usuarioRegistro) {
+                        <div class="detail-row">
+                          <mat-icon>person</mat-icon>
+                          <div class="detail-content">
+                            <span class="detail-label">Registrado por:</span>
+                            <span class="detail-value">{{ movimiento.usuarioRegistro }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Sin historial -->
+    @if (!loading() && timeline().length === 0) {
+      <div class="empty-state">
+        <mat-icon>history_toggle_off</mat-icon>
+        <p>No hay registros de altas o bajas para esta instalación</p>
+        <small>Esta instalación no ha tenido ningún cambio de estado registrado</small>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cerrar()">
+      Cerrar
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,111 @@
+<div class="listado-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>check_circle</mat-icon>
+        Listado de Altas
+      </mat-card-title>
+      <mat-card-subtitle>
+        Registro completo de altas de instalaciones
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filtro de búsqueda -->
+      <div class="filter-section">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Buscar</mat-label>
+          <input
+            matInput
+            placeholder="Código, cliente o motivo..."
+            (keyup)="aplicarFiltro($event)">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Loading -->
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Cargando altas...</p>
+        </div>
+      }
+
+      <!-- Tabla -->
+      @if (!loading() && altasFiltradas().length > 0) {
+        <div class="table-container">
+          <table mat-table [dataSource]="altasFiltradas()" class="altas-table">
+            <!-- ID Alta -->
+            <ng-container matColumnDef="idAlta">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let alta">{{ alta.idAlta }}</td>
+            </ng-container>
+
+            <!-- Código Instalación -->
+            <ng-container matColumnDef="codigoInstalacion">
+              <th mat-header-cell *matHeaderCellDef>Instalación</th>
+              <td mat-cell *matCellDef="let alta">
+                <strong>{{ alta.codigoInstalacion }}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Cliente -->
+            <ng-container matColumnDef="nombreCliente">
+              <th mat-header-cell *matHeaderCellDef>Cliente</th>
+              <td mat-cell *matCellDef="let alta">{{ alta.nombreCliente }}</td>
+            </ng-container>
+
+            <!-- Fecha Alta -->
+            <ng-container matColumnDef="fechaAlta">
+              <th mat-header-cell *matHeaderCellDef>Fecha de Alta</th>
+              <td mat-cell *matCellDef="let alta">{{ formatFecha(alta.fechaAlta) }}</td>
+            </ng-container>
+
+            <!-- Motivo -->
+            <ng-container matColumnDef="motivo">
+              <th mat-header-cell *matHeaderCellDef>Motivo</th>
+              <td mat-cell *matCellDef="let alta">
+                <mat-chip class="motivo-chip">{{ getMotivoLabel(alta.motivo) }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Usuario Registro -->
+            <ng-container matColumnDef="usuarioRegistro">
+              <th mat-header-cell *matHeaderCellDef>Registrado por</th>
+              <td mat-cell *matCellDef="let alta">{{ alta.usuarioRegistro || '-' }}</td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let alta">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="verHistorial(alta)"
+                  matTooltip="Ver historial completo">
+                  <mat-icon>history</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <div class="total-registros">
+            Total: <strong>{{ altasFiltradas().length }}</strong> altas registradas
+          </div>
+        </div>
+      }
+
+      <!-- Sin resultados -->
+      @if (!loading() && altasFiltradas().length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <p>No se encontraron altas</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

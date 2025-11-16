@@ -17,6 +17,7 @@ import { AltasBajasService } from '@core/services/altas-bajas.service';
 import { InstalacionData } from '@shared/models/instalacion.model';
 import { BajaDialogComponent } from '../dialogs/baja-dialog/baja-dialog.component';
 import { AltaDialogComponent } from '../dialogs/alta-dialog/alta-dialog.component';
+import { HistorialDialogComponent } from '../dialogs/historial-dialog/historial-dialog.component';
 
 @Component({
   selector: 'app-gestion-altas-bajas',
@@ -172,21 +173,13 @@ export class GestionAltasBajasComponent {
   verHistorial(): void {
     if (!this.instalacion()) return;
 
-    this.altasBajasService.obtenerHistorial(this.instalacion()!.codigoInstalacion!).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          // TODO: Mostrar historial en un diálogo o navegar a componente de historial
-          console.log('Historial:', response.data);
-          const totalMovimientos = (response.data.altas?.length || 0) + (response.data.bajas?.length || 0);
-          this.snackBar.open(
-            `Historial: ${response.data.altas?.length || 0} altas, ${response.data.bajas?.length || 0} bajas`,
-            'Cerrar',
-            { duration: 5000 }
-          );
-        }
-      },
-      error: () => {
-        this.snackBar.open('Error al obtener historial', 'Cerrar', { duration: 3000 });
+    this.dialog.open(HistorialDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: {
+        codigoInstalacion: this.instalacion()!.codigoInstalacion,
+        nombreCliente: this.instalacion()!.nombreCompleto
       }
     });
   }
