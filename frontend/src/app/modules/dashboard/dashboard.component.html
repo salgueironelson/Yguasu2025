@@ -1,30 +1,105 @@
-<mat-toolbar color="primary">
-  <button mat-icon-button (click)="sidenav.toggle()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span class="app-title">Yguasu - Sistema de Gestión</span>
-  <span class="spacer"></span>
-  <span class="user-info">{{ authService.currentUser()?.usuario }}</span>
-  <button mat-icon-button (click)="logout()">
-    <mat-icon>exit_to_app</mat-icon>
-  </button>
-</mat-toolbar>
-
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidenav mode="side" opened class="sidenav">
-    <mat-nav-list>
-      @for (item of menuItems; track item.path) {
-        <a mat-list-item [routerLink]="item.path" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
-        </a>
-      }
-    </mat-nav-list>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <div class="content">
-      <router-outlet></router-outlet>
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">dashboard</mat-icon>
+      <div>
+        <h1 class="header-title">Dashboard</h1>
+        <p class="header-subtitle">Panel de control del sistema</p>
+      </div>
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+  } @else {
+    <!-- Summary Stats -->
+    <div class="summary-section">
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-item">
+            <mat-icon class="summary-icon active">check_circle</mat-icon>
+            <div class="summary-details">
+              <span class="summary-label">Instalaciones Activas</span>
+              <span class="summary-value">{{ porcentajeActivas }}%</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-item">
+            <mat-icon class="summary-icon cortado">power_off</mat-icon>
+            <div class="summary-details">
+              <span class="summary-label">Instalaciones Cortadas</span>
+              <span class="summary-value">{{ porcentajeCortadas }}%</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-item">
+            <mat-icon class="summary-icon pendiente">pending</mat-icon>
+            <div class="summary-details">
+              <span class="summary-label">Reclamos Pendientes</span>
+              <span class="summary-value">{{ porcentajeReclamosPendientes }}%</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div class="stats-grid">
+      @for (card of statCards(); track card.title) {
+        <mat-card class="stat-card" (click)="navigateTo(card.route)">
+          <mat-card-content>
+            <div class="stat-header">
+              <div class="stat-icon-container" [style.background-color]="card.color">
+                <mat-icon>{{ card.icon }}</mat-icon>
+              </div>
+              <div class="stat-info">
+                <span class="stat-title">{{ card.title }}</span>
+                <span class="stat-description">{{ card.description }}</span>
+              </div>
+            </div>
+            <div class="stat-value">{{ card.value }}</div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">
+        <mat-icon>flash_on</mat-icon>
+        Acciones Rápidas
+      </h2>
+      <div class="actions-grid">
+        <button mat-raised-button color="primary" (click)="navigateTo('/reclamos')">
+          <mat-icon>add</mat-icon>
+          Nuevo Reclamo
+        </button>
+        <button mat-raised-button color="accent" (click)="navigateTo('/altas-bajas')">
+          <mat-icon>swap_vert</mat-icon>
+          Alta/Baja Instalación
+        </button>
+        <button mat-raised-button color="warn" (click)="navigateTo('/cortes-reconexiones/corte-masivo')">
+          <mat-icon>content_cut</mat-icon>
+          Corte Masivo
+        </button>
+        <button mat-raised-button (click)="navigateTo('/cortes-reconexiones')">
+          <mat-icon>power</mat-icon>
+          Reconexiones
+        </button>
+      </div>
+    </div>
+  }
+</div>

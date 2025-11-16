@@ -1,0 +1,95 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- Sidebar -->
+  <mat-sidenav
+    #sidenav
+    [opened]="sidenavOpened()"
+    [mode]="'side'"
+    class="sidenav">
+
+    <!-- Logo -->
+    <div class="logo-container">
+      <mat-icon class="logo-icon">water_drop</mat-icon>
+      <h2 class="logo-text">Yguasu 2025</h2>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Menu Items -->
+    <mat-nav-list class="nav-list">
+      @for (item of menuItems; track item.label) {
+        @if (item.children && item.children.length > 0) {
+          <!-- Item con hijos -->
+          <div class="menu-item-group">
+            <mat-list-item
+              class="menu-item"
+              (click)="toggleExpanded(item.label)">
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+              <mat-icon matListItemMeta class="expand-icon">
+                {{ isExpanded(item.label) ? 'expand_less' : 'expand_more' }}
+              </mat-icon>
+            </mat-list-item>
+
+            <!-- Subitems -->
+            @if (isExpanded(item.label)) {
+              <div class="submenu">
+                @for (child of item.children; track child.label) {
+                  <mat-list-item
+                    class="menu-item submenu-item"
+                    [class.active]="isActive(child.route)"
+                    (click)="navigate(child.route)">
+                    <mat-icon matListItemIcon>{{ child.icon }}</mat-icon>
+                    <span matListItemTitle>{{ child.label }}</span>
+                  </mat-list-item>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Item sin hijos -->
+          <mat-list-item
+            class="menu-item"
+            [class.active]="isActive(item.route)"
+            (click)="navigate(item.route)">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </mat-list-item>
+        }
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Contenido principal -->
+  <mat-sidenav-content class="sidenav-content">
+    <!-- Toolbar -->
+    <mat-toolbar color="primary" class="toolbar">
+      <button
+        mat-icon-button
+        (click)="toggleSidenav()"
+        matTooltip="Toggle menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="toolbar-title">Sistema de Gestión de Agua Potable</span>
+
+      <span class="spacer"></span>
+
+      <button mat-icon-button matTooltip="Notificaciones">
+        <mat-icon>notifications</mat-icon>
+      </button>
+
+      <button mat-icon-button matTooltip="Configuración">
+        <mat-icon>settings</mat-icon>
+      </button>
+
+      <button mat-icon-button matTooltip="Perfil">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Router Outlet -->
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
