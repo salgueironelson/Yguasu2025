@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 import { ReclamoService } from '@core/services/reclamo.service';
+import { InstalacionService } from '@core/services/instalacion.service';
 import { TIPOS_RECLAMO } from '@shared/models/reclamo.model';
 
 @Component({
@@ -40,11 +41,13 @@ import { TIPOS_RECLAMO } from '@shared/models/reclamo.model';
 export class ReclamoCreateComponent {
   private fb = inject(FormBuilder);
   private reclamoService = inject(ReclamoService);
+  private instalacionService = inject(InstalacionService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
   reclamoForm: FormGroup;
   loading = signal(false);
+  buscandoInstalacion = signal(false);
   tieneInstalacion = signal(true);
   tiposReclamo = TIPOS_RECLAMO;
 
@@ -98,25 +101,68 @@ export class ReclamoCreateComponent {
     const codigo = this.reclamoForm.get('codigoInstalacion')?.value;
 
     if (!codigo) {
-      this.toastr.warning('Ingrese un código de instalación');
+      this.toastr.warning('Ingrese un código de instalación', 'Advertencia');
       return;
     }
 
-    // TODO: Implementar búsqueda de cliente por código
-    // Por ahora simulamos con datos de prueba
-    this.datosCliente.set({
-      nombre: 'Juan Pérez García',
-      medidor: '12345678',
-      catastro: 'Z1-R2-M3-C4',
-      categoria: 'Residencial'
-    });
+    // Validar que sea un número válido
+    const codigoNumerico = parseInt(codigo, 10);
+    if (isNaN(codigoNumerico) || codigoNumerico <= 0) {
+      this.toastr.error('El código debe ser un número válido', 'Error');
+      return;
+    }
 
+    this.buscandoInstalacion.set(true);
+
+    this.instalacionService.buscarPorCodigo(codigoNumerico).subscribe({
+      next: (response) => {
+        this.buscandoInstalacion.set(false);
+
+        if (response.success && response.data) {
+          const data = response.data;
+
+          this.datosCliente.set({
+            idInstalacion: data.idInstalacion,
+            nombre: data.nombreCompleto,
+            medidor: data.medidor,
+            catastro: data.catastro,
+            categoria: data.categoria,
+            calle: data.calle,
+            celular: data.celular
+          });
+
+          // Autocompletar formulario con los datos encontrados
+          this.reclamoForm.patchValue({
+            nombreCliente: data.nombreCompleto,
+            numeroMedidor: data.medidor,
+            catastro: data.catastro,
+            categoria: data.categoria,
+            reclamante: data.nombreCompleto,
+            celular: data.celular || this.reclamoForm.get('celular')?.value
+          });
+
+          this.toastr.success(`Instalación encontrada: ${data.nombreCompleto}`, 'Éxito');
+        } else {
+          this.toastr.warning(response.message || 'No se encontró la instalación', 'Advertencia');
+          this.limpiarDatosCliente();
+        }
+      },
+      error: (error) => {
+        this.buscandoInstalacion.set(false);
+        const mensaje = error.error?.message || 'Error al buscar la instalación';
+        this.toastr.error(mensaje, 'Error');
+        this.limpiarDatosCliente();
+      }
+    });
+  }
+
+  limpiarDatosCliente(): void {
+    this.datosCliente.set(null);
     this.reclamoForm.patchValue({
-      nombreCliente: this.datosCliente()?.nombre,
-      numeroMedidor: this.datosCliente()?.medidor,
-      catastro: this.datosCliente()?.catastro,
-      categoria: this.datosCliente()?.categoria,
-      reclamante: this.datosCliente()?.nombre
+      nombreCliente: '',
+      numeroMedidor: '',
+      catastro: '',
+      categoria: ''
     });
   }
 

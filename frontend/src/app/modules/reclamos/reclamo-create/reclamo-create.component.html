@@ -31,9 +31,19 @@
                 }
               </mat-form-field>
 
-              <button mat-raised-button color="primary" type="button" (click)="buscarCliente()">
-                <mat-icon>search</mat-icon>
-                Buscar
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="buscarCliente()"
+                [disabled]="buscandoInstalacion()">
+                @if (buscandoInstalacion()) {
+                  <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                  Buscando...
+                } @else {
+                  <mat-icon>search</mat-icon>
+                  Buscar
+                }
               </button>
             </div>
 
