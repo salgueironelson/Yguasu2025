@@ -1,0 +1,155 @@
+<div class="gestion-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>settings</mat-icon>
+        Gestión de Altas y Bajas
+      </mat-card-title>
+      <mat-card-subtitle>
+        Administre el estado de las instalaciones
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Sección de Búsqueda -->
+      <div class="search-section">
+        <form [formGroup]="searchForm" class="search-form">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Código de Instalación</mat-label>
+            <input
+              matInput
+              formControlName="codigoInstalacion"
+              type="number"
+              placeholder="Ej: 12345"
+              (keyup.enter)="buscarInstalacion()">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="buscarInstalacion()"
+            [disabled]="buscando()">
+            @if (buscando()) {
+              <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+              Buscando...
+            } @else {
+              <mat-icon>search</mat-icon>
+              Buscar
+            }
+          </button>
+        </form>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Información de Instalación -->
+      @if (instalacion()) {
+        <div class="instalacion-info">
+          <h3>Información de la Instalación</h3>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Código:</span>
+              <span class="value">{{ instalacion()!.codigoInstalacion }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Cliente:</span>
+              <span class="value">{{ instalacion()!.nombreCompleto }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Catastro:</span>
+              <span class="value">{{ instalacion()!.catastro }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Categoría:</span>
+              <span class="value">{{ instalacion()!.categoria }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Calle:</span>
+              <span class="value">{{ instalacion()!.calle }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Medidor:</span>
+              <span class="value">{{ instalacion()!.medidor || 'Sin medidor' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Estado Actual:</span>
+              <span class="value">
+                @if (estaActiva()) {
+                  <mat-chip class="estado-chip activo">
+                    <mat-icon>check_circle</mat-icon>
+                    ACTIVO
+                  </mat-chip>
+                } @else if (estaInactiva()) {
+                  <mat-chip class="estado-chip inactivo">
+                    <mat-icon>block</mat-icon>
+                    INACTIVO
+                  </mat-chip>
+                } @else {
+                  <mat-chip class="estado-chip">
+                    <mat-icon>help</mat-icon>
+                    DESCONOCIDO
+                  </mat-chip>
+                }
+              </span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Acciones -->
+          <div class="actions-section">
+            <h3>Acciones Disponibles</h3>
+
+            <div class="actions-buttons">
+              <button
+                mat-raised-button
+                color="warn"
+                (click)="darDeBaja()"
+                [disabled]="estaInactiva()">
+                <mat-icon>block</mat-icon>
+                Dar de Baja
+              </button>
+
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="darDeAlta()"
+                [disabled]="estaActiva()">
+                <mat-icon>check_circle</mat-icon>
+                Dar de Alta
+              </button>
+
+              <button
+                mat-raised-button
+                (click)="verHistorial()">
+                <mat-icon>history</mat-icon>
+                Ver Historial
+              </button>
+
+              <button
+                mat-button
+                (click)="limpiar()">
+                <mat-icon>clear</mat-icon>
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <p>Busque una instalación para comenzar</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

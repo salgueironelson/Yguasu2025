@@ -1,0 +1,91 @@
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+
+  mat-icon {
+    color: #4caf50;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+mat-dialog-content {
+  padding: 24px;
+  min-width: 500px;
+
+  .dialog-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 20px 0;
+
+    strong {
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  .alta-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .full-width {
+      width: 100%;
+    }
+
+    .success-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      border-radius: 4px;
+      color: #2e7d32;
+      font-size: 13px;
+      line-height: 1.5;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        color: #4caf50;
+        flex-shrink: 0;
+      }
+
+      strong {
+        color: #2e7d32;
+      }
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    margin-left: 8px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  mat-dialog-content {
+    min-width: auto;
+    width: 90vw;
+  }
+}
