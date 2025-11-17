@@ -14,8 +14,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { UsuariosInstalacionesService } from '../../../../core/services/usuarios-instalaciones.service';
-import { Usuario, ESTADOS_CIVILES, TIPOS_USUARIO, CATEGORIAS } from '../../../../shared/models/usuario.model';
+import { Usuario, Instalacion, UsuarioConInstalaciones, ESTADOS_CIVILES, TIPOS_USUARIO, CATEGORIAS } from '../../../../shared/models/usuario.model';
+import { ServiciosInstalacionDialogComponent } from '../../dialogs/servicios-instalacion-dialog/servicios-instalacion-dialog.component';
 
 /**
  * Componente para gestión de usuarios e instalaciones
@@ -38,7 +40,8 @@ import { Usuario, ESTADOS_CIVILES, TIPOS_USUARIO, CATEGORIAS } from '../../../..
     MatSnackBarModule,
     MatTabsModule,
     MatExpansionModule,
-    MatChipsModule
+    MatChipsModule,
+    MatTooltipModule
   ],
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.scss']
@@ -52,10 +55,13 @@ export class GestionUsuariosComponent implements OnInit {
   // Data
   usuarios = signal<Usuario[]>([]);
   selectedUsuario = signal<Usuario | null>(null);
+  usuarioConInstalaciones = signal<UsuarioConInstalaciones | null>(null);
+  instalaciones = signal<Instalacion[]>([]);
 
   // States
   loading = signal(false);
   saving = signal(false);
+  loadingInstalaciones = signal(false);
 
   // Catalogs
   estadosCiviles = ESTADOS_CIVILES;
@@ -64,6 +70,7 @@ export class GestionUsuariosComponent implements OnInit {
 
   // Table columns
   usuariosColumns = ['nombreCompleto', 'ci', 'celular', 'totalInstalaciones', 'acciones'];
+  instalacionesColumns = ['codigoInstalacion', 'direccion', 'estado', 'acciones'];
 
   constructor(
     private fb: FormBuilder,
@@ -215,6 +222,39 @@ export class GestionUsuariosComponent implements OnInit {
     this.selectedUsuario.set(usuario);
     this.instalacionForm.patchValue({
       idUsuario: usuario.idUsuario
+    });
+  }
+
+  /**
+   * Ver instalaciones de un usuario
+   */
+  verInstalaciones(usuario: Usuario): void {
+    this.loadingInstalaciones.set(true);
+    this.service.obtenerUsuarioConInstalaciones(usuario.idUsuario).subscribe({
+      next: (response) => {
+        this.loadingInstalaciones.set(false);
+        if (response.success && response.data) {
+          this.usuarioConInstalaciones.set(response.data);
+          this.instalaciones.set(response.data.instalaciones);
+        }
+      },
+      error: (error) => {
+        this.loadingInstalaciones.set(false);
+        this.mostrarError('Error al cargar instalaciones');
+      }
+    });
+  }
+
+  /**
+   * Abrir diálogo de gestión de servicios
+   */
+  gestionarServicios(instalacion: Instalacion): void {
+    this.dialog.open(ServiciosInstalacionDialogComponent, {
+      width: '800px',
+      data: {
+        idInstalacion: instalacion.idInstalacion,
+        codigoInstalacion: instalacion.codigoInstalacion
+      }
     });
   }
 

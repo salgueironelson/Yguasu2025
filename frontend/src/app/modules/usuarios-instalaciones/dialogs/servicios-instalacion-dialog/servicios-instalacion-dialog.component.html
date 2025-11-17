@@ -1,0 +1,115 @@
+<h2 mat-dialog-title>Servicios de Instalación {{ data.codigoInstalacion }}</h2>
+
+<mat-dialog-content>
+  <div class="dialog-container">
+    <!-- Sección: Asignar nuevo servicio -->
+    <div class="asignar-servicio-section">
+      <h3>Asignar Nuevo Servicio</h3>
+      <form [formGroup]="asignarForm" class="asignar-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Servicio</mat-label>
+          <mat-select formControlName="idServicio">
+            @for (servicio of serviciosDisponibles(); track servicio.idServicio) {
+              <mat-option [value]="servicio.idServicio">
+                {{ servicio.servicio }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (asignarForm.get('idServicio')?.hasError('required') && asignarForm.get('idServicio')?.touched) {
+            <mat-error>El servicio es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Medidor (Opcional)</mat-label>
+          <mat-select formControlName="idMedidor">
+            <mat-option [value]="null">Sin medidor</mat-option>
+            @for (medidor of medidoresDisponibles(); track medidor.idMedidor) {
+              <mat-option [value]="medidor.idMedidor">
+                {{ medidor.serie }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="asignarServicio()"
+          [disabled]="asignarForm.invalid || saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>add</mat-icon>
+            Asignar Servicio
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Sección: Servicios asignados -->
+    <div class="servicios-asignados-section">
+      <h3>Servicios Asignados</h3>
+
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        @if (serviciosAsignados().length === 0) {
+          <p class="no-data">No hay servicios asignados a esta instalación.</p>
+        } @else {
+          <table mat-table [dataSource]="serviciosAsignados()" class="servicios-table">
+            <!-- Columna: Nombre Servicio -->
+            <ng-container matColumnDef="nombreServicio">
+              <th mat-header-cell *matHeaderCellDef>Servicio</th>
+              <td mat-cell *matCellDef="let servicio">{{ servicio.nombreServicio }}</td>
+            </ng-container>
+
+            <!-- Columna: Medidor -->
+            <ng-container matColumnDef="serieMedidor">
+              <th mat-header-cell *matHeaderCellDef>Medidor</th>
+              <td mat-cell *matCellDef="let servicio">
+                {{ servicio.serieMedidor || 'Sin medidor' }}
+              </td>
+            </ng-container>
+
+            <!-- Columna: Estado -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let servicio">
+                <span [class]="'estado-badge estado-' + servicio.estado">
+                  {{ servicio.estadoDescripcion }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Columna: Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let servicio">
+                @if (servicio.estado === 'A') {
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="desactivarServicio(servicio.idInstalacionServicio)"
+                    matTooltip="Desactivar servicio">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cerrar()">Cerrar</button>
+</mat-dialog-actions>

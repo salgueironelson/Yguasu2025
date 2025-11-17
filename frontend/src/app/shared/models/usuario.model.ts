@@ -83,7 +83,11 @@ export interface Instalacion {
  * DTO para usuario con instalaciones
  */
 export interface UsuarioConInstalaciones {
-  usuario: Usuario;
+  idUsuario: number;
+  nombreCompleto: string;
+  ci: string;
+  celular?: string;
+  direccion: string;
   instalaciones: Instalacion[];
   totalInstalaciones: number;
   instalacionesActivas: number;

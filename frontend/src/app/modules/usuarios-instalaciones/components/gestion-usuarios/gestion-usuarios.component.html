@@ -211,8 +211,11 @@
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef>Acciones</th>
                 <td mat-cell *matCellDef="let usuario">
-                  <button mat-icon-button (click)="seleccionarUsuario(usuario)">
+                  <button mat-icon-button (click)="seleccionarUsuario(usuario)" matTooltip="Crear instalación">
                     <mat-icon>add_home</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="verInstalaciones(usuario)" matTooltip="Ver instalaciones">
+                    <mat-icon>visibility</mat-icon>
                   </button>
                 </td>
               </ng-container>
@@ -220,6 +223,72 @@
               <tr mat-header-row *matHeaderRowDef="usuariosColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: usuariosColumns;"></tr>
             </table>
+          }
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <!-- Tab Gestionar Instalaciones -->
+    <mat-tab label="Gestionar Instalaciones">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Instalaciones del Usuario</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (usuarioConInstalaciones()) {
+            <div class="usuario-info">
+              <h3>{{ usuarioConInstalaciones()!.nombreCompleto }}</h3>
+              <p><strong>CI:</strong> {{ usuarioConInstalaciones()!.ci }}</p>
+              <div class="estadisticas">
+                <mat-chip color="primary">Total: {{ usuarioConInstalaciones()!.totalInstalaciones }}</mat-chip>
+                <mat-chip color="accent">Activas: {{ usuarioConInstalaciones()!.instalacionesActivas }}</mat-chip>
+                <mat-chip color="warn">Cortadas: {{ usuarioConInstalaciones()!.instalacionesCortadas }}</mat-chip>
+              </div>
+            </div>
+
+            @if (loadingInstalaciones()) {
+              <div class="loading"><mat-spinner diameter="50"></mat-spinner></div>
+            } @else {
+              @if (instalaciones().length === 0) {
+                <p class="no-data">Este usuario no tiene instalaciones registradas.</p>
+              } @else {
+                <table mat-table [dataSource]="instalaciones()">
+                  <ng-container matColumnDef="codigoInstalacion">
+                    <th mat-header-cell *matHeaderCellDef>Código</th>
+                    <td mat-cell *matCellDef="let instalacion">{{ instalacion.codigoInstalacion }}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="direccion">
+                    <th mat-header-cell *matHeaderCellDef>Dirección</th>
+                    <td mat-cell *matCellDef="let instalacion">{{ instalacion.direccion }}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let instalacion">
+                      <span [class]="'estado-badge estado-' + instalacion.estado">
+                        {{ instalacion.estadoDescripcion }}
+                      </span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td mat-cell *matCellDef="let instalacion">
+                      <button mat-raised-button color="primary" (click)="gestionarServicios(instalacion)">
+                        <mat-icon>settings</mat-icon>
+                        Gestionar Servicios
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="instalacionesColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: instalacionesColumns;"></tr>
+                </table>
+              }
+            }
+          } @else {
+            <p class="no-data">Seleccione un usuario desde la pestaña "Listar Usuarios" para ver sus instalaciones.</p>
           }
         </mat-card-content>
       </mat-card>
