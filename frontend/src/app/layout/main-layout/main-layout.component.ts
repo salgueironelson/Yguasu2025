@@ -49,6 +49,11 @@ export class MainLayoutComponent {
       route: '/dashboard'
     },
     {
+      label: 'Usuarios e Instalaciones',
+      icon: 'people',
+      route: '/usuarios-instalaciones'
+    },
+    {
       label: 'Reclamos',
       icon: 'report_problem',
       route: '/reclamos'

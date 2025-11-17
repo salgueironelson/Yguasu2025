@@ -39,6 +39,10 @@ export const DASHBOARD_ROUTES: Routes = [
             loadComponent: () => import('../cortes-reconexiones/components/corte-masivo/corte-masivo.component').then(m => m.CorteMasivoComponent)
           }
         ]
+      },
+      {
+        path: 'usuarios-instalaciones',
+        loadComponent: () => import('../usuarios-instalaciones/components/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent)
       }
     ]
   }
